@@ -12,10 +12,13 @@ win = pg.GraphicsLayoutWidget(show=True)
 win.nextRow()
 p_all = win.addPlot()
 p_all.addLegend()
+p_all.disableAutoRange(axis=pg.ViewBox.XAxis)
+chunk_size = 10000
+p_all.setXRange(0, chunk_size)
 
-win.nextRow()
-plot_recent = win.addPlot()
-plot_recent.setLabel('bottom', 'Time', 's')
+#win.nextRow()
+#plot_recent = win.addPlot()
+#plot_recent.setLabel('bottom', 'Time', 's')
 
 def find_port():
     for port in comports():
@@ -25,7 +28,7 @@ def find_port():
             return V5port
     
     print("V5 not found")
-    return "COM5"
+    return 0
 # end find_port
 
 def collect_data(ser):
@@ -43,12 +46,14 @@ def collect_data(ser):
                 df = pd.concat([df, data], ignore_index=True)
 
                 # print data
-                print("\n" + data.to_string(index=False))
+                #print("\n" + data.to_string(index=False))
 # end collect_data
 
 curves = []
+start = 0
+end = chunk_size
 def update_graph():
-    global df, curves
+    global df, curves, start, end
     if (df.shape[1] - 1 > len(curves)):
         p_all.setLabel('bottom', df.columns[0])
         for i in range(len(curves), df.shape[1] - 1):
@@ -57,8 +62,15 @@ def update_graph():
     else:
         for i in range(len(curves)):
             curves[i].setData(x=df.iloc[:,0], y=df.iloc[:,i + 1])
+    '''if (df.shape[0] > 0 and df.iloc[-1,0] > chunk_size + start):
+        start = start + chunk_size / 2
+        p_all.setXRange(start, df.iloc[-1,0] + chunk_size / 2)'''
+    if (df.shape[0] > 0 and df.iloc[-1,0] > end):
+        end = end * 2
+        p_all.setXRange(0, end)
 # end update_graph
 
+# timer for updating graph
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update_graph)
 timer.start(50)
