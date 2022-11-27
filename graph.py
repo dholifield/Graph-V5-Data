@@ -6,13 +6,12 @@ import serial
 
 df = pd.DataFrame()
 running = True
-win = pg.GraphicsLayoutWidget(show=True, title="V5 Data")
+
+win = pg.GraphicsLayoutWidget(show=True)
 
 win.nextRow()
-plot_all = win.addPlot()
-plot_all.setDownsampling(mode='peak')
-plot_all.setClipToView(True)
-curve_all = plot_all.plot()
+p_all = win.addPlot()
+p_all.addLegend()
 
 win.nextRow()
 plot_recent = win.addPlot()
@@ -26,7 +25,7 @@ def find_port():
             return V5port
     
     print("V5 not found")
-    return 0
+    return "COM5"
 # end find_port
 
 def collect_data(ser):
@@ -44,27 +43,43 @@ def collect_data(ser):
                 df = pd.concat([df, data], ignore_index=True)
 
                 # print data
-                #print("\n" + data.to_string(index=False))
+                print("\n" + data.to_string(index=False))
 # end collect_data
 
+curves = []
+def update_graph():
+    global df, curves
+    if (df.shape[1] - 1 > len(curves)):
+        p_all.setLabel('bottom', df.columns[0])
+        for i in range(len(curves), df.shape[1] - 1):
+            curve = p_all.plot(x=df.iloc[:,0], y=df.iloc[:,i + 1], name=df.columns[i + 1], pen=(i,df.shape[1]))
+            curves.append(curve)
+    else:
+        for i in range(len(curves)):
+            curves[i].setData(x=df.iloc[:,0], y=df.iloc[:,i + 1])
+# end update_graph
+
+timer = pg.QtCore.QTimer()
+timer.timeout.connect(update_graph)
+timer.start(50)
 
 # main
+if __name__ == '__main__':
+    # find V5 port
+    port = find_port()
+    if port == 0:
+        exit()
 
-# find V5 port
-port = find_port()
-if port == 0:
-    exit()
+    # open serial port
+    ser = serial.Serial(port, 115200, timeout=0.1)
+    print("Starting data collection...\n")
+    # start data collection thread
+    collect_thread = threading.Thread(target=collect_data, args=(ser,))
+    collect_thread.start()
 
-# open serial port
-ser = serial.Serial(port, 115200, timeout=0.1)
-print("Starting data collection...\n")
-# start data collection thread
-collect_thread = threading.Thread(target=collect_data, args=(ser,))
-collect_thread.start()
+    # graph data
+    pg.exec()
 
-# graph data
-
-
-# stop data collection
-running = False
-collect_thread.join()
+    # stop data collection
+    running = False
+    collect_thread.join()
