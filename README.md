@@ -2,7 +2,7 @@
 **Easy to use method of creating live graphs for the VEX V5 system.** \
 This program reads data from the serial output from the V5 Brain allowing you to easily graph as many sets of data as you'd like in real-time.
 ## How to Use
-Download the `graph.py` and `requirements.txt` files and run `pip install -r requirements.txt`. Then run `python graph.py` when you are ready to start graphing data. You can run this before or while the program on the V5 brain is running
+Download the `graph.py` and `requirements.txt` files and run `pip install -r requirements.txt`. Then run `python graph.py` when you are ready to start graphing data. You can run this before or while the program on the V5 brain is running.
 
 To graph the data, print out `graph_data` from your V5 program right before printing out the data you need.
 ```c
