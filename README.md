@@ -10,11 +10,11 @@ printf("graph_data\n");
 ```
 Select which data to use by printing out a comma-separated list of the data labels followed by the data values, separated by `|`.\
 The first value will be the x-axis that all following data points will use, which is often time.
-```
+```c
 printf("time (ms),data1,data2|%d,%f,%f\n", time, data1, data2);
 ```
 Here's an example that will graph the velocity of both flywheel motors as a function of time
-```
+```c
 printf("time (ms),f1 velocity (rpm),f2 velocity (rpm)|%d,%.2f,%.2f\n", pros::millis(), fly1.get_velocity(), fly2.get_velocity);
 ```
 You can print out as much other data as you'd like and the program will still function, as long as you follow the format and print the data after `graph_data`
