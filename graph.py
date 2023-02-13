@@ -49,6 +49,9 @@ def collect_data(ser):
                 #print("\n" + data.to_string(index=False))
 # end collect_data
 
+# change to True to enable scrolling graph
+scrolling = False
+
 curves = []
 start = 0
 end = chunk_size
@@ -66,8 +69,16 @@ def update_graph():
         start = start + chunk_size / 2
         p_all.setXRange(start, df.iloc[-1,0] + chunk_size / 2)'''
     if (df.shape[0] > 0 and df.iloc[-1,0] > end):
-        end = end * 2
-        p_all.setXRange(0, end)
+        if not scrolling:
+            end = end * 2
+            p_all.setXRange(0, end)
+        else:
+            end = df.iloc[-1,0]
+            p_all.setXRange(end - chunk_size, end)
+    '''
+    if scrolling and df.shape[0] > 0:
+        p_all.setYRange(max(0, df.iloc[-1,1] - 50), df.iloc[-1,1] + 50)
+    '''
 # end update_graph
 
 # timer for updating graph
