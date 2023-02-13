@@ -50,7 +50,7 @@ def collect_data(ser):
 # end collect_data
 
 # change to True to enable scrolling graph
-scrolling = True
+scrolling = False
 
 curves = []
 start = 0
@@ -73,7 +73,7 @@ def update_graph():
             end = end * 2
             p_all.setXRange(0, end)
         else:
-            end = df.iloc[-1,0] + 5
+            end = df.iloc[-1,0]
             p_all.setXRange(end - chunk_size, end)
     '''
     if scrolling and df.shape[0] > 0:
