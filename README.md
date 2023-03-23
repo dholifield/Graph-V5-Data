@@ -18,15 +18,16 @@ Here's an example that will graph the velocity of both flywheel motors as a func
 printf("time (ms),f1 velocity (rpm),f2 velocity (rpm)|%d,%.2f,%.2f\n", pros::millis(), fly1.get_velocity(), fly2.get_velocity);
 ```
 You can print out as much other data as you'd like and the program will still function, as long as you follow the format and print the data after `graph_data`
+### Controls
+|Key|Command         |
+|:-:|----------------|
+|R  |Reset graph data|
+|S  |Toggle scrolling|
 ## Notes
 If you are having issues recognizing the V5 device, you can replace `port = find_port()` with `port = "COM1"` in main replacing `COM1` with the usb port your V5 brain is plugged into.
 ## Limitations
 Currently, the program only supports having a single set of data for the x-axis shared by all the data sets.
 
-The program auto-scales by doubling the x-axis range each time it reaches the edge of the screen. The default size is `chunk_size = 10000` which would be 10 seconds if using milliseconds as the x-axis, increasing to 20s, 40s, ect. If you aren't working with milliseconds and would like to change the default size, feel free to change that value in the code.
-
-You will need to close and restart the program whenever you'd like to clear the graph.
-
-There is currently no way to export the data which is something I'd like to add. For now, just stick to screenshots of the graphs.
+There is currently no built-in way to export the data which is something I'd like to add. For now, you can right click the graph and use the context menu to export an image.
 
 I hope to develop a full GUI in the future to make the program much more user-friendly.
