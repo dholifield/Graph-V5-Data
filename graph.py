@@ -1,4 +1,5 @@
 from serial.tools.list_ports import comports
+from pyqtgraph.Qt import QtCore
 import pyqtgraph as pg
 import pandas as pd
 import threading
@@ -7,7 +8,24 @@ import serial
 df = pd.DataFrame()
 running = True
 
-win = pg.GraphicsLayoutWidget(show=True)
+class KeyPressWindow(pg.GraphicsLayoutWidget):
+    sigKeyPress = QtCore.pyqtSignal(object)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def keyPressEvent(self, ev):
+        self.scene().keyPressEvent(ev)
+        self.sigKeyPress.emit(ev)
+
+def keyPressed(evt):
+    if evt.text() == "r":
+        df.drop(df.index, inplace=True) 
+
+
+
+win = KeyPressWindow(show=True)
+win.sigKeyPress.connect(keyPressed)
 
 win.nextRow()
 p_all = win.addPlot()
@@ -50,7 +68,7 @@ def collect_data(ser):
 # end collect_data
 
 # change to True to enable scrolling graph
-scrolling = False
+scrolling = True
 
 curves = []
 start = 0
