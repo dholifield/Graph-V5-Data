@@ -22,10 +22,11 @@ class KeyPressWindow(pg.GraphicsLayoutWidget):
         self.sigKeyPress.emit(ev)
 
 def keyPressed(evt):
-    global scrolling
+    global df, p_all, chunk_size, scrolling
 
     if evt.text() == "r":
         df.drop(df.index, inplace=True) 
+        p_all.setXRange(0, chunk_size)
     if evt.text() == "s":
         scrolling = not scrolling
 
