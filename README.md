@@ -30,3 +30,9 @@ You will need to close and restart the program whenever you'd like to clear the 
 There is currently no way to export the data which is something I'd like to add. For now, just stick to screenshots of the graphs.
 
 I hope to develop a full GUI in the future to make the program much more user-friendly.
+## What's on the Way
+When I find time, I hope to make a full GUI to make the program much easier to use. This will include things such as resetting the graph, save graph or data, data visibility, different graph modes, and potentially more.
+I also hope to make the serial data format more intuitive and with greater customization.
+Please let me know if there are any features you would like added!
+
+
