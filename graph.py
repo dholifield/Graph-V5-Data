@@ -1,13 +1,39 @@
 from serial.tools.list_ports import comports
+from pyqtgraph.Qt import QtCore
 import pyqtgraph as pg
 import pandas as pd
 import threading
 import serial
 
+# change to True to enable scrolling graph
+scrolling = True
+
 df = pd.DataFrame()
 running = True
 
-win = pg.GraphicsLayoutWidget(show=True)
+class KeyPressWindow(pg.GraphicsLayoutWidget):
+    sigKeyPress = QtCore.pyqtSignal(object)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def keyPressEvent(self, ev):
+        self.scene().keyPressEvent(ev)
+        self.sigKeyPress.emit(ev)
+
+def keyPressed(evt):
+    global df, p_all, chunk_size, start, end, scrolling
+
+    if evt.text() == "r":
+        df.drop(df.index, inplace=True)
+        start = 0
+        end = chunk_size
+        p_all.setXRange(start, end)
+    if evt.text() == "s":
+        scrolling = not scrolling
+
+win = KeyPressWindow(show=True)
+win.sigKeyPress.connect(keyPressed)
 
 win.nextRow()
 p_all = win.addPlot()
@@ -16,9 +42,6 @@ p_all.disableAutoRange(axis=pg.ViewBox.XAxis)
 chunk_size = 10000
 p_all.setXRange(0, chunk_size)
 
-#win.nextRow()
-#plot_recent = win.addPlot()
-#plot_recent.setLabel('bottom', 'Time', 's')
 
 def find_port():
     for port in comports():
@@ -49,9 +72,6 @@ def collect_data(ser):
                 #print("\n" + data.to_string(index=False))
 # end collect_data
 
-# change to True to enable scrolling graph
-scrolling = False
-
 curves = []
 start = 0
 end = chunk_size
@@ -65,9 +85,7 @@ def update_graph():
     else:
         for i in range(len(curves)):
             curves[i].setData(x=df.iloc[:,0], y=df.iloc[:,i + 1])
-    '''if (df.shape[0] > 0 and df.iloc[-1,0] > chunk_size + start):
-        start = start + chunk_size / 2
-        p_all.setXRange(start, df.iloc[-1,0] + chunk_size / 2)'''
+    
     if (df.shape[0] > 0 and df.iloc[-1,0] > end):
         if not scrolling:
             end = end * 2
@@ -75,10 +93,6 @@ def update_graph():
         else:
             end = df.iloc[-1,0]
             p_all.setXRange(end - chunk_size, end)
-    '''
-    if scrolling and df.shape[0] > 0:
-        p_all.setYRange(max(0, df.iloc[-1,1] - 50), df.iloc[-1,1] + 50)
-    '''
 # end update_graph
 
 # timer for updating graph
